@@ -96,13 +96,30 @@ if not processed_data:
     print("▶ 현재 수집 조건에 맞는 장비가 없어 저장하지 않습니다.")
     exit()
 
-# 6. CSV 파일로 저장 (클라우드 현재 폴더에 저장되도록 파일명만 씁니다)
-df = pd.DataFrame(processed_data)[["측정시간", "장비명", "℃", "%rF"]]
-df = df.sort_values(by="장비명", ascending=True)
-
+# 6. CSV 파일 저장 및 중복 제거 로직
 file_path = "Saveris_Data.csv"
 
-if not os.path.exists(file_path):
-    df.to_csv(file_path, index=False, mode='w', encoding='utf-8-sig')
+if os.path.exists(file_path):
+    # 기존 데이터를 읽어옵니다.
+    existing_df = pd.read_csv(file_path)
+    
+    # [측정시간, 장비명] 조합이 기존에 없는 데이터만 골라냅니다.
+    new_rows = []
+    for _, row in df.iterrows():
+        # 시간과 장비명이 모두 일치하는 행이 있는지 검사
+        is_duplicate = ((existing_df['측정시간'] == row['측정시간']) & 
+                        (existing_df['장비명'] == row['장비명'])).any()
+        
+        if not is_duplicate:
+            new_rows.append(row)
+            
+    if new_rows:
+        # 새로운 데이터만 추가(append)합니다.
+        pd.DataFrame(new_rows).to_csv(file_path, index=False, mode='a', header=False, encoding='utf-8-sig')
+        print(f"▶ {len(new_rows)}건의 새로운 데이터를 추가했습니다.")
+    else:
+        print("▶ 이미 기록된 데이터입니다. 중복 저장을 건너뜁니다.")
 else:
-    df.to_csv(file_path, index=False, mode='a', header=False, encoding='utf-8-sig')
+    # 파일이 없으면 새로 만듭니다.
+    df.to_csv(file_path, index=False, mode='w', encoding='utf-8-sig')
+    print("▶ 새 데이터 파일을 생성했습니다.")
