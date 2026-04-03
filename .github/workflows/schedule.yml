@@ -2,7 +2,7 @@ name: Hourly Saveris Data Collector
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 매시간 정각마다 실행
+    - cron: '10 * * * *'  # 매시 10분마다 실행
   workflow_dispatch:     # 내가 원할 때 버튼을 눌러서 수동 실행 가능하게 함
 
 jobs:
