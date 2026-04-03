@@ -64,18 +64,23 @@ for item in latest_values:
             if is_weekday and is_working_hour:
                 should_save = True
                 
-        if should_save:
+if should_save:
             measured_time_str = None
             if ts:
                 try:
                     ts_float = float(ts)
                     dt_utc = datetime.fromtimestamp(ts_float / 1000.0, tz=timezone.utc)
                     dt_kst = dt_utc.astimezone(timezone(timedelta(hours=9)))
-                    measured_time_str = dt_kst.strftime("%Y-%m-%d %H:%M")
+                    
+                    # 🚀 변경 1: 실제 분(%M)을 무시하고 무조건 '00'으로 강제 고정
+                    measured_time_str = dt_kst.strftime("%Y-%m-%d %H:00") 
+                    
                 except:
                     measured_time_str = str(ts)
             else:
-                measured_time_str = now_kst.strftime("%Y-%m-%d %H:%M") 
+                
+                # 🚀 변경 2: 위와 동일하게 '00'으로 강제 고정
+                measured_time_str = now_kst.strftime("%Y-%m-%d %H:00")
 
             if display_name not in grouped_data:
                 grouped_data[display_name] = {
