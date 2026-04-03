@@ -1,0 +1,36 @@
+name: Hourly Saveris Data Collector
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 매시간 정각마다 실행
+  workflow_dispatch:     # 내가 원할 때 버튼을 눌러서 수동 실행 가능하게 함
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 파일 불러오기
+        uses: actions/checkout@v3
+
+      - name: 파이썬 설치
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 필요한 라이브러리(pandas, requests) 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas
+
+      - name: 파이썬 수집기 실행 (비밀 금고에서 토큰 꺼내오기)
+        env:
+          SAVERIS_TOKEN: ${{ secrets.SAVERIS_TOKEN }}
+        run: python saveris_auto_collector.py
+
+      - name: 새로 쌓인 데이터를 GitHub 창고에 다시 덮어쓰기 저장
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add Saveris_Data.csv
+          git commit -m "Add hourly saveris data" || echo "No changes to commit"
+          git push
