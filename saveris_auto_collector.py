@@ -68,20 +68,18 @@ for item in latest_values:
         if should_save:
             measured_time_str = None
             if ts:
-                try:
-                    ts_float = float(ts)
-                    dt_utc = datetime.fromtimestamp(ts_float / 1000.0, tz=timezone.utc)
-                    dt_kst = dt_utc.astimezone(timezone(timedelta(hours=9)))
-
-                    # 🚀 변경 1: 실제 분(%M)을 무시하고 무조건 '00'으로 강제 고정
-                    measured_time_str = dt_kst.strftime("%Y-%m-%d %H:00")
-
-                except:
-                    measured_time_str = str(ts)
+                # Testo API가 준 글자(예: 2026-04-04T09:30:00Z)를 그대로 가져옴
+                raw_time = str(ts) 
+                
+                # 앞의 14글자(2026-04-04T09:)까지만 자른 뒤 "00:00Z"를 강제로 붙임!
+                if len(raw_time) >= 16:
+                    measured_time_str = raw_time[:14] + "00:00Z"
+                else:
+                    measured_time_str = raw_time
             else:
-                # 🚀 변경 2: 위와 동일하게 '00'으로 강제 고정
-                measured_time_str = now_kst.strftime("%Y-%m-%d %H:00")
-
+                # 데이터에 시간이 아예 비어있다면, 현재 시간의 00분으로 대체
+                measured_time_str = now_kst.strftime("%Y-%m-%dT%H:00:00Z")
+                
             if display_name not in grouped_data:
                 grouped_data[display_name] = {
                     "측정시간": measured_time_str,
