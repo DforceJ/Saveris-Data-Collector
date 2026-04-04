@@ -64,7 +64,6 @@ for item in latest_values:
             if is_weekday and is_working_hour:
                 should_save = True
 
-        # 🚨 여기서부터 들여쓰기를 완벽하게 맞췄습니다!
         if should_save:
             measured_time_str = None
             if ts:
