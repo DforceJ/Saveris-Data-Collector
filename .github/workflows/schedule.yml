@@ -1,8 +1,6 @@
 name: Hourly Saveris Data Collector
 
 on:
-  schedule:
-    - cron: '50,55 * * * *'  # 50분과 55분에 실행 (서버 지연 27분을 완벽히 피하고, 다음 시간 데이터와 겹치지 않는 안전 구간)
   workflow_dispatch:     # 내가 원할 때 버튼을 눌러서 수동 실행 가능하게 함
 
 jobs:
