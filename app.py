@@ -69,7 +69,7 @@ try:
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
-        st.header("🔍 데이터 필터")
+        st.header("#####🔍 데이터 필터")
         selected_devices = []
         with st.expander("✅ 측정 위치", expanded=True):
             st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
@@ -77,7 +77,7 @@ try:
                 if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
 
         st.markdown("---")
-        st.subheader("📅 측정 일자 및 시간")
+        st.subheader("#####📅 측정 일자 및 시간")
         
         def render_filter(label, item_list, key_p):
             sel = []
