@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (초기에는 사이드바가 열려 있도록 설정)
+# 1. 페이지 설정
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
@@ -12,20 +12,43 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ✅ 1. 방해물만 가장 안전하게 제거 (우측 상단 툴바, 하단 워터마크, 빨간 배) */
-.stAppDeployButton, [data-testid="stToolbar"], footer, [data-testid="stStatusWidget"] {
+/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, 하단 빨간 배, 기본 툴바) */
+[data-testid="stToolbar"], 
+[data-testid="stStatusWidget"], 
+.stAppDeployButton, 
+footer {
     display: none !important;
 }
 
-/* 🚨 화살표(>) 버튼을 건드리는 모든 위험한 해킹 코드를 전면 폐기했습니다! 🚨 */
-/* 이제 스트림릿이 알아서 가장 안정적으로 버튼을 열고 닫아줄 것입니다. */
+/* 🚀 2. 핵심: 사이드바 열기(>) 버튼 강제 소환 (최신 업데이트 이름까지 타겟팅) 🚀 */
+/* 이전 이름(collapsedControl)과 새 이름(stSidebarCollapsedControl) 모두에 빨간색 강제 적용 */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+    background-color: rgba(255, 0, 0, 0.1) !important; /* 버튼 주변에 옅은 빨간 네모 배경을 깔아 무조건 보이게 함 */
+    border-radius: 5px !important;
+    padding: 5px !important;
+    margin-top: 5px !important;
+    margin-left: 5px !important;
+}
 
-/* ✅ 2. 부장님 디테일 설정값 절대 사수 */
+/* 화살표 아이콘을 크고 진한 빨간색으로! */
+[data-testid="collapsedControl"] svg,
+[data-testid="stSidebarCollapsedControl"] svg {
+    color: red !important;
+    fill: red !important;
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* ✅ 3. 부장님 디테일 설정 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
-/* ✅ 3. 모바일 화면 폰트 최적화 */
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
