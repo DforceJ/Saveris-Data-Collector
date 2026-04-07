@@ -8,31 +8,36 @@ st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바(Deploy 버튼 등) 완전히 제거 */
+/* 1. 우측 상단 툴바 완전히 제거 */
 .stAppDeployButton, [data-testid="stToolbar"] {
     display: none !important;
 }
 
-/* 2. ✅ 우측 하단 빨간 종이배(Manage app) 및 하단 푸터 완벽 제거 */
+/* 2. 우측 하단 빨간 배 아이콘 및 장식 제거 */
 footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
     display: none !important;
 }
 
-/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 강제 소환 및 색상 고정 */
-/* 버튼이 배경에 묻히지 않도록 흰색으로 강제하고 위치를 고정합니다. */
+/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 강제 소환 및 부장님표 Red 고정 */
 [data-testid="collapsedControl"] {
     display: flex !important;
     visibility: visible !important;
-    z-index: 999999 !important;
+    z-index: 1000001 !important; /* 👈 숫자를 더 높여서 모든 레이어 위로 올림 */
+    position: fixed !important;
+    top: 5px !important;
+    left: 5px !important;
 }
 
-[data-testid="collapsedControl"] button {
-    color: red !important; /* 화살표 색상을 빨간색으로 고정 */
+/* 💡 버튼 자체와 내부 아이콘(svg)까지 모두 빨간색으로 강제 고정 */
+[data-testid="collapsedControl"] button, 
+[data-testid="collapsedControl"] svg {
+    color: red !important;
+    fill: red !important;
 }
 
-/* 4. 상단 헤더 영역이 버튼을 가리지 않도록 투명화 */
+/* 4. 💡 버튼을 가로막는 상단 헤더 막을 아예 제거하여 클릭 가능하게 함 */
 header[data-testid="stHeader"] {
-    background: transparent !important;
+    display: none !important;
 }
 
 /* 기존 부장님 설정값 유지 */
@@ -40,11 +45,10 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
-/* 모바일 화면(폭 768px 이하) 설정 */
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
-        padding-top: 1rem !important;
+        padding-top: 2rem !important; /* 화살표와 겹치지 않게 여백 추가 */
     }
     h3 {
         font-size: 12px !important; 
