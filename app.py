@@ -20,11 +20,11 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 
 @media (max-width: 768px) {
     h1 { 
-        font-size: 22px !important; 
+        font-size: 16px !important; 
         padding-top: 1rem !important; 
     }
     h3 {
-        font-size: 12px !important; 
+        font-size: 10x !important; 
     }
 }
 </style>
