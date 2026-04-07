@@ -3,37 +3,28 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (화살표 버튼 소환을 위해 초기 상태를 collapsed로 고정)
+# 1. 페이지 설정 (초기 사이드바 닫힘 상태 유지)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
+# 2. 아주 안전하고 순수한 CSS만 적용 (레이어 파괴 요소 완전 제거!)
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바(Deploy) 및 하단 빨간 배(Manage app) 아이콘 완전히 제거 */
-/* 복잡한 코드 다 빼고 가장 확실한 태그만 숨깁니다. */
-[data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
+/* ✅ 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘만 안전하게 제거 */
+[data-testid="stToolbar"], [data-testid="stStatusWidget"], [data-testid="stDecoration"], footer {
     display: none !important;
 }
 
-/* 2. 상단 헤더의 배경만 투명하게 만듦 (헤더 자체를 지우면 화살표도 같이 죽습니다!) */
-header[data-testid="stHeader"] {
-    background: transparent !important;
-}
-
-/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 순정 상태에서 빨간색(Red)만 입히기 */
-[data-testid="collapsedControl"] button {
-    color: red !important; /* 버튼 색상 빨간색 */
-}
+/* ✅ 2. 좌측 상단 메뉴 열기(>) 버튼 - 구조는 건드리지 않고 오직 '빨간색'만 입힘 */
 [data-testid="collapsedControl"] svg {
-    fill: red !important;  /* 아이콘 색상 빨간색 */
-    width: 30px !important;
-    height: 30px !important;
+    color: red !important;
+    fill: red !important;
 }
 
-/* 4. 기존 부장님 설정값 (폰트 등) 절대 사수 */
+/* ✅ 3. 기존 부장님 설정값 (폰트 등) 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -41,10 +32,10 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 20px !important; 
-        padding-top: 2rem !important; 
+        padding-top: 1rem !important; /* 억지로 띄웠던 여백 원상복구 */
     }
     h3 {
-        font-size: 12px !important; /* 부장님 설정값 12px 유지 */
+        font-size: 12px !important; 
     }
 }
 </style>
@@ -137,7 +128,6 @@ try:
             )
         plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
 
-    # 💡 [핵심] 수치 중복 방지 로직: 화면 크기에 맞춰 최대 10개만 균등하게 표시
     display_count = 10 
     step_lbl = max(1, len(plot_df) // display_count)
     plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
