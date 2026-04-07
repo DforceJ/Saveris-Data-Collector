@@ -3,39 +3,47 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (초기 사이드바 닫힘 상태 유지)
+# 1. 페이지 설정 (초기 사이드바 닫힘 상태 추가)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 2. 아주 안전하고 순수한 CSS만 적용 (레이어 파괴 요소 완전 제거!)
 st.markdown("""
 <style>
-/* ✅ 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘만 안전하게 제거 */
-[data-testid="stToolbar"], [data-testid="stStatusWidget"], [data-testid="stDecoration"], footer {
+/* ✅ 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘 안전하게 제거 */
+[data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
     display: none !important;
+    visibility: hidden !important;
 }
 
-/* ✅ 2. 좌측 상단 메뉴 열기(>) 버튼 - 구조는 건드리지 않고 오직 '빨간색'만 입힘 */
+/* ✅ 2. 좌측 메뉴 열기(>) 버튼과 상단 헤더가 스크롤 시 사라지지 않도록 영구 고정 (부장님 원본 복구) */
+[data-testid="collapsedControl"], [data-testid="stHeader"] {
+    opacity: 1 !important;
+    transform: none !important;
+    z-index: 999999 !important; 
+    background: transparent !important; /* 헤더 배경만 투명하게 */
+}
+
+/* ✅ 3. 메뉴 열기(>) 버튼 색상을 부장님표 '빨간색(Red)'으로 강제 적용 */
 [data-testid="collapsedControl"] svg {
     color: red !important;
     fill: red !important;
 }
 
-/* ✅ 3. 기존 부장님 설정값 (폰트 등) 사수 */
+/* ✅ 4. 부장님 디테일 설정값 (절대 유지) */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
 @media (max-width: 768px) {
     h1 { 
-        font-size: 20px !important; 
-        padding-top: 1rem !important; /* 억지로 띄웠던 여백 원상복구 */
+        font-size: 22px !important; 
+        padding-top: 1rem !important;
     }
     h3 {
-        font-size: 12px !important; 
+        font-size: 12px !important; /* 부장님 설정값 12px 유지 */
     }
 }
 </style>
@@ -128,14 +136,16 @@ try:
             )
         plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
 
+    # 💡 [요청 반영] 수치 중복 방지 로직 (화면 크기에 맞춰 최대 10개만 균등하게 표시)
     display_count = 10 
     step_lbl = max(1, len(plot_df) // display_count)
     plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
     plot_df['H_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_HUMI])]
     x_fmt = "%m월 %d일" if len(plot_df[COL_TIME].dt.date.unique()) > 1 else "%H시"
 
-    # 그래프 시각화
+    # 📊 그래프 시각화 
     col1, col2 = st.columns(2)
+
     with col1:
         fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
                         markers=True, title="📈 실시간 온도 현황", line_shape='spline')
