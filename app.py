@@ -3,60 +3,60 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (사이드바 상태 추가)
+# 1. 페이지 설정 (화살표 버튼 소환을 위해 초기 상태를 collapsed로 고정)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
-    initial_sidebar_state="collapsed" # 👈 화살표 버튼을 강제로 소환하는 핵심 설정!
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 완벽 박멸 */
+/* 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘 완전히 제거 */
 [data-testid="stToolbar"], [data-testid="stDecoration"], footer, [data-testid="stStatusWidget"] {
     display: none !important;
     visibility: hidden !important;
 }
 
-/* 2. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 지표면 위로 강제 인양 */
+/* 2. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 헤더에서 탈출시켜서 화면에 고정 */
 [data-testid="collapsedControl"] {
     display: flex !important;
     visibility: visible !important;
     position: fixed !important;
-    top: 15px !important;   /* 위치를 살짝 아래로 내려서 더 잘 보이게 함 */
-    left: 15px !important;  /* 왼쪽 여백 확보 */
-    z-index: 99999999 !important; /* 모든 레이어의 왕 */
-    background-color: rgba(255, 255, 255, 0.2) !important; /* 살짝 밝은 배경을 넣어 버튼 강조 */
-    border-radius: 50% !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 9999999 !important;
+    background-color: rgba(255, 255, 255, 0.1) !important; /* 약간의 배경을 넣어 버튼 영역 확보 */
+    border-radius: 10px !important;
+    padding: 5px !important;
 }
 
-/* 3. ✅ 부장님의 Red 아이콘 - 그림자까지 넣어서 더 선명하게 */
+/* 3. ✅ 부장님께서 지정하신 빨간색(Red) 화살표 아이콘 강제 적용 */
 [data-testid="collapsedControl"] svg {
     fill: red !important;
     color: red !important;
-    width: 30px !important;
-    height: 30px !important;
-    filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.5)) !important;
+    width: 28px !important;
+    height: 28px !important;
 }
 
-/* 4. 투명 헤더가 버튼 클릭을 방해하지 못하도록 높이 제거 */
+/* 4. 헤더를 없애는 대신 투명하게 만들어 버튼이 클릭되도록 함 */
 header[data-testid="stHeader"] {
-    height: 0px !important;
-    background: transparent !important;
+    background-color: rgba(0,0,0,0) !important;
+    color: rgba(0,0,0,0) !important;
 }
 
-/* 기존 부장님 설정값 절대 사수 */
+/* 기존 부장님 설정값 (폰트 등) 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
 @media (max-width: 768px) {
     h1 { 
-        font-size: 22px !important; 
-        padding-top: 3.5rem !important; /* 빨간 버튼과 겹치지 않게 본문 더 내림 */
+        font-size: 20px !important; 
+        padding-top: 3rem !important; 
     }
     h3 {
-        font-size: 12px !important; 
+        font-size: 12px !important; /* 부장님 설정값 유지 */
     }
 }
 </style>
@@ -131,15 +131,11 @@ try:
         st.warning("해당 조건에 맞는 데이터가 없습니다.")
         st.stop()
 
-    # ==========================================
-    # 💡 [요청 반영] 슬라이더 크기를 1/5 로 축소
-    # ==========================================
     st.markdown("### ⏱️ 측정 일자 및 시간 범위 정밀 조절")
     min_t = plot_df[COL_TIME].min().to_pydatetime()
     max_t = plot_df[COL_TIME].max().to_pydatetime()
     
     if min_t != max_t:
-        # 전체 가로폭을 1:4 비율로 쪼개서, 왼쪽 1/5 영역에만 슬라이더를 그립니다.
         col_slider, _ = st.columns([1, 4]) 
         with col_slider:
             sel_time = st.slider(
@@ -153,30 +149,23 @@ try:
             )
         plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
 
-    step_lbl = max(1, len(plot_df) // 12)
+    # 💡 [핵심] 수치 중복 방지 로직: 화면 크기에 맞춰 최대 10개만 균등하게 표시
+    display_count = 10 
+    step_lbl = max(1, len(plot_df) // display_count)
     plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
     plot_df['H_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_HUMI])]
     x_fmt = "%m월 %d일" if len(plot_df[COL_TIME].dt.date.unique()) > 1 else "%H시"
 
-    # ==========================================
-    # 📊 그래프 시각화 
-    # ==========================================
+    # 그래프 시각화
     col1, col2 = st.columns(2)
-
     with col1:
         fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
                         markers=True, title="📈 실시간 온도 현황", line_shape='spline')
         fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
         fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
-        
         fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-        
-        fig_t.update_layout(
-            yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
-            xaxis=dict(tickformat=x_fmt, title="측정시간")
-        )
-        fig_t.update_xaxes(rangeslider=dict(visible=False)) 
-        
+        fig_t.update_layout(yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
+                            xaxis=dict(tickformat=x_fmt, title="측정시간"))
         st.plotly_chart(fig_t, use_container_width=True)
 
     with col2:
@@ -184,24 +173,15 @@ try:
                         markers=True, title="💧 실시간 습도 현황", line_shape='spline')
         fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
         fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
-        
         fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-        
-        fig_h.update_layout(
-            yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
-            xaxis=dict(tickformat=x_fmt, title="측정시간")
-        )
-        fig_h.update_xaxes(rangeslider=dict(visible=False))
-
+        fig_h.update_layout(yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
+                            xaxis=dict(tickformat=x_fmt, title="측정시간"))
         st.plotly_chart(fig_h, use_container_width=True)
 
     st.markdown("---")
     with st.expander("🔍 클라우드 서버 원본 데이터 상세 보기"):
         st.dataframe(filtered_df)
 
-    # =======================================================
-    # 💡 [여기에 새로 추가!] 데이터 측정 기준 안내 토글 (Expander)
-    # =======================================================
     with st.expander("ℹ️ 데이터 측정 기준"):
         st.markdown("""
         **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
@@ -212,23 +192,21 @@ try:
         1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
         2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
         3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
-       
+        4. **실행 감시 (Health Check):** GitHub Actions의 서버 상태에 따른 실행 지연(로봇 지각)을 감시하기 위해 **외부 모니터링 알람**이 설정되어 있습니다.
+
         **📊 장비별 수집 조건 (필터링 로직)**
         1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
         2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
 
         **🖥️ 대시보드 연동**
-        수집 로봇이 클라우드에 적재한 CSV 원본 데이터는, 현재 배포된 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다. 내부 동적 시각화 엔진(Plotly)을 거쳐 24시간 언제 어디서든 PC와 스마트폰으로 최신 온습도 현황을 즉시 관제할 수 있습니다.
+        수집 로봇이 적재한 CSV 원본 데이터는 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다.
         """)
 
-    # ==========================================
-    # 💡 [요청 반영] 우측 하단 만든 사람 및 문의처 표시
-    # ==========================================
     st.markdown(
-        """
+        f"""
         <div style='text-align: right; color: #888888; font-size: 15px; margin-top: 30px; margin-bottom: 20px;'>
             🛠️ <b>Developed by:</b> Corebuild 조동진 부장 <br>
-            📧 <b>관리자 문의:</b> <a href='mailto:admin@corebuild.co.kr' style='color: #888888; text-decoration: none;'>djcho@corebuild.co.kr</a>
+            📧 <b>관리자 문의:</b> <a href='mailto:djcho@corebuild.co.kr' style='color: #888888; text-decoration: none;'>djcho@corebuild.co.kr</a>
         </div>
         """, 
         unsafe_allow_html=True
