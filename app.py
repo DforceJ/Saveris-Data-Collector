@@ -8,36 +8,36 @@ st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바 완전히 제거 */
-.stAppDeployButton, [data-testid="stToolbar"] {
+/* 1. 우측 상단 툴바(Deploy, 세로점3개 등) 및 하단 종이배 완벽 제거 */
+[data-testid="stToolbar"], [data-testid="stDecoration"], footer, [data-testid="stStatusWidget"] {
     display: none !important;
 }
 
-/* 2. 우측 하단 빨간 배 아이콘 및 장식 제거 */
-footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
-    display: none !important;
-}
-
-/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 강제 소환 및 부장님표 Red 고정 */
+/* 2. ✅ 좌측 상단 화살표(>) 버튼 - 위치와 가시성 절대 고정 */
 [data-testid="collapsedControl"] {
     display: flex !important;
     visibility: visible !important;
-    z-index: 1000001 !important; /* 👈 숫자를 더 높여서 모든 레이어 위로 올림 */
     position: fixed !important;
-    top: 5px !important;
-    left: 5px !important;
+    top: 0px !important;  /* 최상단 */
+    left: 10px !important; /* 왼쪽 살짝 띄움 */
+    z-index: 9999999 !important; /* 모든 것보다 위에 */
+    background-color: transparent !important;
+    width: 50px !important;
+    height: 50px !important;
 }
 
-/* 💡 버튼 자체와 내부 아이콘(svg)까지 모두 빨간색으로 강제 고정 */
-[data-testid="collapsedControl"] button, 
+/* 3. ✅ 부장님이 직접 고르신 '빨간색(Red)' 아이콘 강제 적용 */
 [data-testid="collapsedControl"] svg {
-    color: red !important;
     fill: red !important;
+    color: red !important;
+    width: 35px !important; /* 모바일에서도 잘 보이게 조금 키움 */
+    height: 35px !important;
 }
 
-/* 4. 💡 버튼을 가로막는 상단 헤더 막을 아예 제거하여 클릭 가능하게 함 */
+/* 4. 버튼을 가리고 있던 헤더의 배경만 지우고 높이를 확보함 */
 header[data-testid="stHeader"] {
-    display: none !important;
+    background: transparent !important;
+    height: 0px !important; /* 헤더가 본문을 가리지 않게 함 */
 }
 
 /* 기존 부장님 설정값 유지 */
@@ -48,7 +48,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
-        padding-top: 2rem !important; /* 화살표와 겹치지 않게 여백 추가 */
+        padding-top: 3rem !important; /* 빨간 화살표와 겹치지 않게 본문 더 내림 */
     }
     h3 {
         font-size: 12px !important; 
