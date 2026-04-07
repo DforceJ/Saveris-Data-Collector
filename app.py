@@ -3,51 +3,17 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (사이드바 상시 열림)
-st.set_page_config(
-    page_title="COREBUILD 클라우드 온습도", 
-    layout="wide",
-    initial_sidebar_state="expanded" 
-)
+# 1. 페이지 설정
+st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
+# 2. 가장 깨끗하고 안전한 CSS (사이드바 관련 해킹 코드 전면 삭제)
 st.markdown("""
 <style>
-/* 🚀 1. 방해물 완벽 철거 (빨간 배, 상단 헤더, 로고 등) */
-header[data-testid="stHeader"], 
-footer, 
-[data-testid="stToolbar"], 
-[data-testid="stDecoration"], 
-[data-testid="stStatusWidget"], 
-[class^="viewerBadge_"] {
-    display: none !important;
-}
+/* 기본 헤더, 푸터만 깔끔하게 숨김 */
+header {visibility: hidden;}
+footer {visibility: hidden;}
 
-/* 🚀 2. 🚨 최후의 처방: 닫기(<<) 버튼이 사는 '사이드바 헤더' 구역 자체를 폭파시킴 🚨 */
-/* 이 구역을 날려버리면 스트림릿이 닫기 버튼을 아예 화면에 그릴 수 없습니다. */
-[data-testid="stSidebarHeader"] {
-    display: none !important;
-    height: 0px !important;
-    padding: 0px !important;
-    margin: 0px !important;
-}
-
-/* 혹시 모를 좀비 버튼들을 위한 3중 방어막 */
-[data-testid="stSidebarCollapseButton"], 
-[data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {
-    display: none !important;
-    opacity: 0 !important;
-    width: 0px !important;
-    height: 0px !important;
-    pointer-events: none !important;
-}
-
-/* 🚀 3. 상단 공간 확보 */
-.block-container {
-    padding-top: 2rem !important;
-}
-
-/* ✅ 4. 부장님 디테일 설정값 절대 사수 */
+/* 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -55,12 +21,10 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
+        padding-top: 1rem !important; 
     }
     h3 {
         font-size: 12px !important; 
-    }
-    .block-container {
-        padding-top: 1rem !important;
     }
 }
 </style>
@@ -98,122 +62,131 @@ try:
     def toggle_all(key_prefix, target_list, master_key):
         for item in target_list: st.session_state[f"{key_prefix}_{item}"] = st.session_state[master_key]
 
-    st.sidebar.header("🔍 데이터 필터")
-    selected_devices = []
-    with st.sidebar.expander("✅ 측정 위치", expanded=True):
-        st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
-        for d in device_list:
-            if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
+    # =================================================================
+    # 💡 [핵심] 화면을 좌측(필터)과 우측(메인 차트)으로 단단하게 분할
+    # =================================================================
+    col_filter, col_main = st.columns([1, 3.5])
 
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("📅 측정 일자 및 시간")
-    
-    def render_filter(label, item_list, key_p):
-        sel = []
-        with st.sidebar.expander(label):
-            m_key = f"m_{key_p}"
-            st.checkbox(f"{label} 전체", key=m_key, on_change=toggle_all, args=(key_p, item_list, m_key))
-            for item in item_list:
-                disp = f"{item}년" if key_p=='y' else f"{item}월" if key_p=='m' else f"{item}일" if key_p=='d' else f"{item}시"
-                if st.checkbox(disp, key=f"{key_p}_{item}"): sel.append(item)
-        return sel
+    # ------------------ 좌측: 데이터 필터 영역 ------------------
+    with col_filter:
+        st.header("🔍 데이터 필터")
+        selected_devices = []
+        with st.expander("✅ 측정 위치", expanded=True):
+            st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
+            for d in device_list:
+                if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
 
-    s_y = render_filter("년도", years, "y")
-    s_m = render_filter("월", months, "m")
-    s_d = render_filter("일", days, "d")
-    s_h = render_filter("시간", hours, "h")
-
-    if not selected_devices or not s_y or not s_m or not s_d or not s_h:
-        st.warning("👈 데이터 필터에서 항목을 선택해 주세요.")
-        st.stop()
-
-    filtered_df = df[(df[COL_DEVICE].isin(selected_devices)) & (df[COL_TIME].dt.year.isin(s_y)) & (df[COL_TIME].dt.month.isin(s_m)) & (df[COL_TIME].dt.day.isin(s_d)) & (df[COL_TIME].dt.hour.isin(s_h))]
-    plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) == len(device_list) else filtered_df.copy()
-    plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) == len(device_list) else plot_df[COL_DEVICE]
-
-    if plot_df.empty:
-        st.warning("해당 조건에 맞는 데이터가 없습니다.")
-        st.stop()
-
-    st.markdown("### ⏱️ 측정 일자 및 시간 범위 정밀 조절")
-    min_t = plot_df[COL_TIME].min().to_pydatetime()
-    max_t = plot_df[COL_TIME].max().to_pydatetime()
-    
-    if min_t != max_t:
-        col_slider, _ = st.columns([1, 4]) 
-        with col_slider:
-            sel_time = st.slider(
-                "기간 조절", 
-                min_value=min_t, 
-                max_value=max_t, 
-                value=(min_t, max_t), 
-                format="MM/DD HH:mm", 
-                step=timedelta(hours=1), 
-                label_visibility="collapsed"
-            )
-        plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
-
-    display_count = 10 
-    step_lbl = max(1, len(plot_df) // display_count)
-    plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
-    plot_df['H_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_HUMI])]
-    x_fmt = "%m월 %d일" if len(plot_df[COL_TIME].dt.date.unique()) > 1 else "%H시"
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
-                        markers=True, title="📈 실시간 온도 현황", line_shape='spline')
-        fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
-        fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
-        fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-        fig_t.update_layout(yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
-                            xaxis=dict(tickformat=x_fmt, title="측정시간"))
-        st.plotly_chart(fig_t, use_container_width=True)
-
-    with col2:
-        fig_h = px.line(plot_df, x=COL_TIME, y=COL_HUMI, color=COL_DEVICE, text='H_L', 
-                        markers=True, title="💧 실시간 습도 현황", line_shape='spline')
-        fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
-        fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
-        fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-        fig_h.update_layout(yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
-                            xaxis=dict(tickformat=x_fmt, title="측정시간"))
-        st.plotly_chart(fig_h, use_container_width=True)
-
-    st.markdown("---")
-    with st.expander("🔍 클라우드 서버 원본 데이터 상세 보기"):
-        st.dataframe(filtered_df)
-
-    with st.expander("ℹ️ 데이터 측정 기준"):
-        st.markdown("""
-        **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
+        st.markdown("---")
+        st.subheader("📅 측정 일자 및 시간")
         
-        코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
+        def render_filter(label, item_list, key_p):
+            sel = []
+            with st.expander(label):
+                m_key = f"m_{key_p}"
+                st.checkbox(f"{label} 전체", key=m_key, on_change=toggle_all, args=(key_p, item_list, m_key))
+                for item in item_list:
+                    disp = f"{item}년" if key_p=='y' else f"{item}월" if key_p=='m' else f"{item}일" if key_p=='d' else f"{item}시"
+                    if st.checkbox(disp, key=f"{key_p}_{item}"): sel.append(item)
+            return sel
 
-        **⚙️ 작동 방식**
-        1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
-        2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
-        3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
-        4. **실행 감시 (Health Check):** GitHub Actions의 서버 상태에 따른 실행 지연(로봇 지각)을 감시하기 위해 **외부 모니터링 알람**이 설정되어 있습니다.
+        s_y = render_filter("년도", years, "y")
+        s_m = render_filter("월", months, "m")
+        s_d = render_filter("일", days, "d")
+        s_h = render_filter("시간", hours, "h")
 
-        **📊 장비별 수집 조건 (필터링 로직)**
-        1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
-        2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
+    # ------------------ 우측: 메인 차트 및 데이터 영역 ------------------
+    with col_main:
+        if not selected_devices or not s_y or not s_m or not s_d or not s_h:
+            st.warning("👈 좌측 데이터 필터에서 항목을 선택해 주세요.")
+            st.stop()
 
-        **🖥️ 대시보드 연동**
-        수집 로봇이 적재한 CSV 원본 데이터는 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다.
-        """)
+        filtered_df = df[(df[COL_DEVICE].isin(selected_devices)) & (df[COL_TIME].dt.year.isin(s_y)) & (df[COL_TIME].dt.month.isin(s_m)) & (df[COL_TIME].dt.day.isin(s_d)) & (df[COL_TIME].dt.hour.isin(s_h))]
+        plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) == len(device_list) else filtered_df.copy()
+        plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) == len(device_list) else plot_df[COL_DEVICE]
 
-    st.markdown(
-        f"""
-        <div style='text-align: right; color: #888888; font-size: 15px; margin-top: 30px; margin-bottom: 20px;'>
-            🛠️ <b>Developed by:</b> Corebuild 조동진 부장 <br>
-            📧 <b>관리자 문의:</b> <a href='mailto:djcho@corebuild.co.kr' style='color: #888888; text-decoration: none;'>djcho@corebuild.co.kr</a>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
+        if plot_df.empty:
+            st.warning("해당 조건에 맞는 데이터가 없습니다.")
+            st.stop()
+
+        st.markdown("### ⏱️ 측정 일자 및 시간 범위 정밀 조절")
+        min_t = plot_df[COL_TIME].min().to_pydatetime()
+        max_t = plot_df[COL_TIME].max().to_pydatetime()
+        
+        if min_t != max_t:
+            col_slider, _ = st.columns([1, 4]) 
+            with col_slider:
+                sel_time = st.slider(
+                    "기간 조절", 
+                    min_value=min_t, 
+                    max_value=max_t, 
+                    value=(min_t, max_t), 
+                    format="MM/DD HH:mm", 
+                    step=timedelta(hours=1), 
+                    label_visibility="collapsed"
+                )
+            plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
+
+        display_count = 10 
+        step_lbl = max(1, len(plot_df) // display_count)
+        plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
+        plot_df['H_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_HUMI])]
+        x_fmt = "%m월 %d일" if len(plot_df[COL_TIME].dt.date.unique()) > 1 else "%H시"
+
+        col_g1, col_g2 = st.columns(2)
+
+        with col_g1:
+            fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
+                            markers=True, title="📈 실시간 온도 현황", line_shape='spline')
+            fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
+            fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
+            fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
+            fig_t.update_layout(yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
+                                xaxis=dict(tickformat=x_fmt, title="측정시간"))
+            st.plotly_chart(fig_t, use_container_width=True)
+
+        with col_g2:
+            fig_h = px.line(plot_df, x=COL_TIME, y=COL_HUMI, color=COL_DEVICE, text='H_L', 
+                            markers=True, title="💧 실시간 습도 현황", line_shape='spline')
+            fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
+            fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
+            fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
+            fig_h.update_layout(yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
+                                xaxis=dict(tickformat=x_fmt, title="측정시간"))
+            st.plotly_chart(fig_h, use_container_width=True)
+
+        st.markdown("---")
+        with st.expander("🔍 클라우드 서버 원본 데이터 상세 보기"):
+            st.dataframe(filtered_df)
+
+        with st.expander("ℹ️ 데이터 측정 기준"):
+            st.markdown("""
+            **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
+            
+            코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
+
+            **⚙️ 작동 방식**
+            1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
+            2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
+            3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
+            4. **실행 감시 (Health Check):** GitHub Actions의 서버 상태에 따른 실행 지연(로봇 지각)을 감시하기 위해 **외부 모니터링 알람**이 설정되어 있습니다.
+
+            **📊 장비별 수집 조건 (필터링 로직)**
+            1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
+            2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
+
+            **🖥️ 대시보드 연동**
+            수집 로봇이 적재한 CSV 원본 데이터는 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다.
+            """)
+
+        st.markdown(
+            f"""
+            <div style='text-align: right; color: #888888; font-size: 15px; margin-top: 30px; margin-bottom: 20px;'>
+                🛠️ <b>Developed by:</b> Corebuild 조동진 부장 <br>
+                📧 <b>관리자 문의:</b> <a href='mailto:djcho@corebuild.co.kr' style='color: #888888; text-decoration: none;'>djcho@corebuild.co.kr</a>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
 
 except Exception as e:
     st.error(f"🚨 오류 발생: {e}")
