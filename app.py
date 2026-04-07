@@ -6,35 +6,29 @@ from datetime import timedelta
 # 1. 페이지 설정
 st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
-# 2. 가장 깨끗하고 안전한 CSS (사이드바 관련 해킹 코드 전면 삭제)
+# 2. 방해물 및 불필요한 링크 아이콘 제거 CSS
 st.markdown("""
 <style>
-/* 기본 헤더, 푸터만 깔끔하게 숨김 */
 header {visibility: hidden;}
 footer {visibility: hidden;}
-
-/* ======================================================= */
-/* 🚀 [여기에 새로 추가!] 제목 옆에 뜨는 자동 링크 아이콘 숨기기 */
-[data-testid="stMarkdownContainer"] h1 a,
-[data-testid="stMarkdownContainer"] h2 a,
-[data-testid="stMarkdownContainer"] h3 a {
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], [class^="viewerBadge_"] {
     display: none !important;
 }
-/* ======================================================= */
 
-/* 부장님 디테일 설정값 절대 사수 */
+/* 제목 옆 자동 링크 아이콘 숨기기 */
+[data-testid="stMarkdownContainer"] h1 a,
+[data-testid="stMarkdownContainer"] h2 a,
+[data-testid="stMarkdownContainer"] h3 a,
+[data-testid="stMarkdownContainer"] h4 a {
+    display: none !important;
+}
+
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
 @media (max-width: 768px) {
-    h1 { 
-        font-size: 16px !important; 
-        padding-top: 1rem !important; 
-    }
-    h3 {
-        font-size: 10x !important; 
-    }
+    h1 { font-size: 22px !important; padding-top: 1rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -71,16 +65,12 @@ try:
     def toggle_all(key_prefix, target_list, master_key):
         for item in target_list: st.session_state[f"{key_prefix}_{item}"] = st.session_state[master_key]
 
-    # =================================================================
-    # 💡 [핵심] 화면을 좌측(필터)과 우측(메인 차트)으로 단단하게 분할
-    # =================================================================
-    col_filter, col_main = st.columns([0.8, 3.2])
+    # 화면을 좌측(0.5)과 우측(3.5)으로 분할
+    col_filter, col_main = st.columns([0.5, 3.5])
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
-        # 1. 'st.header'를 'st.markdown'으로 바꾸고 앞에 '###' 추가
-        st.markdown("##### 🔍 데이터 필터") 
-        
+        st.markdown("### 🔍 데이터 필터")
         selected_devices = []
         with st.expander("✅ 측정 위치", expanded=True):
             st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
@@ -88,9 +78,7 @@ try:
                 if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
 
         st.markdown("---")
-        
-        # 2. 'st.subheader'를 'st.markdown'으로 바꾸고 앞에 '####' 추가
-        st.markdown("##### 📅 측정 일자 및 시간")
+        st.markdown("#### 📅 측정 일자/시간")
         
         def render_filter(label, item_list, key_p):
             sel = []
@@ -115,7 +103,7 @@ try:
 
         filtered_df = df[(df[COL_DEVICE].isin(selected_devices)) & (df[COL_TIME].dt.year.isin(s_y)) & (df[COL_TIME].dt.month.isin(s_m)) & (df[COL_TIME].dt.day.isin(s_d)) & (df[COL_TIME].dt.hour.isin(s_h))]
         
-        # 👇 'len(device_list)' 부분을 '2'로, '==' 를 '>=' 로 변경했습니다! 👇
+        # 2개 이상 선택 시 전체 평균으로 묶기
         plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) >= 2 else filtered_df.copy()
         plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) >= 2 else plot_df[COL_DEVICE]
 
@@ -131,16 +119,16 @@ try:
 
         col_g1, col_g2 = st.columns(2)
 
+        # 💡 핵심: on_select="rerun" 을 추가하여 클릭 이벤트를 감지합니다.
         with col_g1:
             fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
                             markers=True, title="📈 실시간 온도 현황", line_shape='spline')
             fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
             fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
             fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            # 👇 여기에 showlegend=False, 를 추가했습니다! 👇
             fig_t.update_layout(showlegend=False, yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
-            st.plotly_chart(fig_t, use_container_width=True)
+            event_t = st.plotly_chart(fig_t, use_container_width=True, on_select="rerun", selection_mode="points")
 
         with col_g2:
             fig_h = px.line(plot_df, x=COL_TIME, y=COL_HUMI, color=COL_DEVICE, text='H_L', 
@@ -148,33 +136,51 @@ try:
             fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
             fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
             fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            # 👇 여기에도 showlegend=False, 를 추가했습니다! 👇
             fig_h.update_layout(showlegend=False, yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
-            st.plotly_chart(fig_h, use_container_width=True)
+            event_h = st.plotly_chart(fig_h, use_container_width=True, on_select="rerun", selection_mode="points")
 
         st.markdown("---")
-        with st.expander("🔍 클라우드 서버 원본 데이터 상세 보기"):
-            st.dataframe(filtered_df)
+        
+        # =================================================================
+        # 🎯 [추가된 기능] 클릭한 타점의 상세 데이터를 표로 보여주는 영역
+        # =================================================================
+        st.markdown("### 🎯 선택된 타점 상세 데이터")
+        
+        selected_time = None
+        # 온도 그래프에서 클릭한 경우 시간 가져오기
+        if event_t and len(event_t.selection.points) > 0:
+            selected_time = event_t.selection.points[0]["x"]
+        # 습도 그래프에서 클릭한 경우 시간 가져오기
+        elif event_h and len(event_h.selection.points) > 0:
+            selected_time = event_h.selection.points[0]["x"]
+
+        if selected_time:
+            try:
+                # 클릭된 시간을 데이터프레임 형식(datetime)에 맞게 변환
+                clicked_dt = pd.to_datetime(selected_time).tz_localize(None)
+                # 원본 필터링 데이터에서 해당 시간의 데이터만 추출
+                detail_df = filtered_df[filtered_df[COL_TIME] == clicked_dt]
+                
+                if not detail_df.empty:
+                    # 인덱스(1, 2, 3...)를 숨기고 깔끔한 표로 출력
+                    st.dataframe(detail_df, use_container_width=True, hide_index=True)
+                else:
+                    st.info("해당 시간의 상세 데이터가 없습니다.")
+            except Exception as e:
+                st.error("데이터를 불러오는 중 오류가 발생했습니다.")
+        else:
+            st.info("👆 위 그래프의 동그란 타점(점)을 클릭하시면, 해당 시간의 상세 데이터가 이곳에 표시됩니다.")
+        # =================================================================
+
+
+        with st.expander("🔍 클라우드 서버 전체 원본 데이터 보기"):
+            st.dataframe(filtered_df, use_container_width=True, hide_index=True)
 
         with st.expander("ℹ️ 데이터 측정 기준"):
             st.markdown("""
-            **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
-            
+            **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템**
             코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
-
-            **⚙️ 작동 방식**
-            1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
-            2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
-            3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
-            4. **실행 감시 (Health Check):** GitHub Actions의 서버 상태에 따른 실행 지연(로봇 지각)을 감시하기 위해 **외부 모니터링 알람**이 설정되어 있습니다.
-
-            **📊 장비별 수집 조건 (필터링 로직)**
-            1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
-            2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
-
-            **🖥️ 대시보드 연동**
-            수집 로봇이 적재한 CSV 원본 데이터는 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다.
             """)
 
         st.markdown(
