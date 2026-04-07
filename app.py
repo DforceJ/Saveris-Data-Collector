@@ -13,6 +13,15 @@ st.markdown("""
 header {visibility: hidden;}
 footer {visibility: hidden;}
 
+/* ======================================================= */
+/* 🚀 [여기에 새로 추가!] 제목 옆에 뜨는 자동 링크 아이콘 숨기기 */
+[data-testid="stMarkdownContainer"] h1 a,
+[data-testid="stMarkdownContainer"] h2 a,
+[data-testid="stMarkdownContainer"] h3 a {
+    display: none !important;
+}
+/* ======================================================= */
+
 /* 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
@@ -69,7 +78,7 @@ try:
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
-        st.header("#####🔍 데이터 필터")
+        st.header("🔍 데이터 필터")
         selected_devices = []
         with st.expander("✅ 측정 위치", expanded=True):
             st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
@@ -77,7 +86,7 @@ try:
                 if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
 
         st.markdown("---")
-        st.subheader("#####📅 측정 일자 및 시간")
+        st.subheader("📅 측정 일자 및 시간")
         
         def render_filter(label, item_list, key_p):
             sel = []
