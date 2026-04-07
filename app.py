@@ -3,55 +3,29 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정
+# 1. 페이지 설정 (사이드바는 기기 화면 크기에 맞춰 자동으로 열리고 닫히도록 설정)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="auto" 
 )
 
 st.markdown("""
 <style>
-/* 🚀 1. 스트림릿 클라우드 강제 주입 아이콘 완벽 철거 (오른쪽 아래 빨간배, 노란 로고) */
-/* 클라우드가 몰래 심어두는 고유 뱃지 클래스명과 iframe을 통째로 날려버립니다. */
-[data-testid="stToolbar"], 
-[data-testid="stStatusWidget"], 
-footer,
-.stAppDeployButton,
-[class^="viewerBadge_"], 
-iframe[title="Streamlit cloud badge"] {
+/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, Manage App 빨간 배, 기본 메뉴) */
+.stAppDeployButton, [data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
     display: none !important;
     visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
 }
 
-/* 🚀 2. 하얀색으로 숨어버린 메뉴 열기(>) 버튼 강제 발굴 및 '빨간색(Red)' 도색 */
-[data-testid="collapsedControl"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* stroke(테두리 선)와 fill(채우기) 모두 빨간색으로 강제하여 라이트/다크 모드 상관없이 무조건 보이게 함 */
-[data-testid="collapsedControl"] button,
-[data-testid="collapsedControl"] svg,
-[data-testid="collapsedControl"] path {
-    color: red !important;
-    fill: red !important;
-    stroke: red !important;
-}
-
-/* 🚀 3. 보이지 않는 헤더 막이 버튼 클릭을 방해하지 못하도록 투과 처리 */
+/* ✅ 2. 🚨 핵심 해결: 모바일 스크롤 시 버튼이 숨지 않도록 헤더를 영구 고정 */
 header[data-testid="stHeader"] {
-    background: transparent !important;
-    pointer-events: none !important; 
+    transform: none !important; /* 스크롤 시 위로 도망가는 애니메이션 강제 취소 */
+    background: transparent !important; 
 }
-[data-testid="collapsedControl"] {
-    pointer-events: auto !important; 
-}
+/* ❌ 주의: 이전처럼 화살표 버튼 자체의 색상이나 위치를 억지로 건드리는 코드는 모두 삭제했습니다. */
 
-/* ✅ 4. 부장님 디테일 설정값 절대 사수 */
+/* ✅ 3. 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -62,7 +36,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
         padding-top: 1rem !important; 
     }
     h3 {
-        font-size: 12px !important; 
+        font-size: 12px !important; /* 부장님 설정 12px 유지 */
     }
 }
 </style>
