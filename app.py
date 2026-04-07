@@ -12,28 +12,20 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, Manage App 빨간 배, 기본 툴바) */
-.stAppDeployButton, [data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
+/* ✅ 1. 방해물만 가장 안전하게 제거 (우측 상단 툴바, 하단 워터마크, 빨간 배) */
+.stAppDeployButton, [data-testid="stToolbar"], footer, [data-testid="stStatusWidget"] {
     display: none !important;
 }
 
-/* ✅ 2. 🚨 핵심 처방: 숨어버린 화살표(>) 버튼 구출 작전 🚨 */
-/* 사이드바를 닫았을 때 나타나는 버튼을 맨 앞으로 당기고, 크기를 키워 빨간색으로 고정합니다. */
-[data-testid="collapsedControl"] {
-    z-index: 999999 !important; /* 화면 최상단으로 끌어올림 */
-}
-[data-testid="collapsedControl"] svg {
-    color: #FF4B4B !important; /* 눈에 확 띄는 스트림릿 레드 색상 */
-    fill: #FF4B4B !important;
-    width: 2rem !important;    /* 버튼 크기를 약간 키워서 클릭하기 쉽게 함 */
-    height: 2rem !important;
-}
+/* 🚨 화살표(>) 버튼을 건드리는 모든 위험한 해킹 코드를 전면 폐기했습니다! 🚨 */
+/* 이제 스트림릿이 알아서 가장 안정적으로 버튼을 열고 닫아줄 것입니다. */
 
-/* ✅ 3. 부장님 디테일 설정값 절대 사수 */
+/* ✅ 2. 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
+/* ✅ 3. 모바일 화면 폰트 최적화 */
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
