@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (초기 사이드바 닫힘 상태 추가)
+# 1. 페이지 설정
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
@@ -12,15 +12,46 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ✅ 1. 방해물만 제거: 우측 상단 툴바, Deploy 버튼, 하단 빨간 배(Manage app) */
-[data-testid="stToolbar"], .stAppDeployButton, [data-testid="stStatusWidget"], footer {
+/* 🚀 1. 스트림릿 클라우드 강제 주입 아이콘 완벽 철거 (오른쪽 아래 빨간배, 노란 로고) */
+/* 클라우드가 몰래 심어두는 고유 뱃지 클래스명과 iframe을 통째로 날려버립니다. */
+[data-testid="stToolbar"], 
+[data-testid="stStatusWidget"], 
+footer,
+.stAppDeployButton,
+[class^="viewerBadge_"], 
+iframe[title="Streamlit cloud badge"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-/* 🚨 화살표 버튼과 상단 헤더를 억지로 건드리는 '모든 CSS'를 전면 폐기했습니다! (순정 상태 유지) 🚨 */
-/* 스트림릿이 알아서 라이트/다크 모드에 맞춰 가장 잘 보이는 색으로 화살표를 그려줄 것입니다. */
+/* 🚀 2. 하얀색으로 숨어버린 메뉴 열기(>) 버튼 강제 발굴 및 '빨간색(Red)' 도색 */
+[data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
-/* ✅ 2. 부장님의 디테일 텍스트 설정 (안전한 코드만 남김) */
+/* stroke(테두리 선)와 fill(채우기) 모두 빨간색으로 강제하여 라이트/다크 모드 상관없이 무조건 보이게 함 */
+[data-testid="collapsedControl"] button,
+[data-testid="collapsedControl"] svg,
+[data-testid="collapsedControl"] path {
+    color: red !important;
+    fill: red !important;
+    stroke: red !important;
+}
+
+/* 🚀 3. 보이지 않는 헤더 막이 버튼 클릭을 방해하지 못하도록 투과 처리 */
+header[data-testid="stHeader"] {
+    background: transparent !important;
+    pointer-events: none !important; 
+}
+[data-testid="collapsedControl"] {
+    pointer-events: auto !important; 
+}
+
+/* ✅ 4. 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -28,7 +59,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
-        padding-top: 1rem !important;
+        padding-top: 1rem !important; 
     }
     h3 {
         font-size: 12px !important; 
@@ -124,14 +155,12 @@ try:
             )
         plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
 
-    # 💡 [요청 반영] 수치 중복 방지 로직 (화면 크기에 맞춰 최대 10개만 균등하게 표시)
     display_count = 10 
     step_lbl = max(1, len(plot_df) // display_count)
     plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
     plot_df['H_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_HUMI])]
     x_fmt = "%m월 %d일" if len(plot_df[COL_TIME].dt.date.unique()) > 1 else "%H시"
 
-    # 📊 그래프 시각화 
     col1, col2 = st.columns(2)
 
     with col1:
