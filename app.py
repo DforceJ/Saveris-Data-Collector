@@ -8,28 +8,39 @@ st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
 st.markdown("""
 <style>
-/* 💡 [추가] 우측 상단 툴바 및 메뉴 완전히 숨기기 */
+/* 1. 우측 상단 툴바 및 메뉴 숨기기 */
 [data-testid="stToolbar"] {visibility: hidden !important;}
 
-/* 💡 [추가] 좌측 메뉴 열기(>) 버튼과 상단 헤더가 스크롤 시 사라지지 않도록 영구 고정 */
-[data-testid="collapsedControl"], [data-testid="stHeader"] {
+/* 2. ✅ [추가] 우측 하단 빨간 종이배 아이콘 및 푸터 완전히 숨기기 */
+footer {display: none !important;}
+[data-testid="stStatusWidget"] {display: none !important;}
+
+/* 3. ✅ [개선] 모바일 좌측 화살표(>) 강제 표시 및 고정 */
+[data-testid="collapsedControl"] {
+    display: flex !important; /* '안 보임' 상태를 강제로 '보임'으로 변경 */
+    visibility: visible !important;
+    z-index: 1000000 !important; /* 가장 최상단으로 올림 */
     opacity: 1 !important;
-    transform: none !important;
-    z-index: 999999 !important; 
+}
+
+/* 4. 상단 헤더 투명화 및 화살표 버튼 위치 확보 */
+[data-testid="stHeader"] {
+    background: transparent !important;
+    display: block !important;
 }
 
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
-/* 💡 [신규 추가] 모바일 화면(폭 768px 이하)에서 메인 제목 크기 줄이기 */
+/* 모바일 화면(폭 768px 이하)에서 글자 크기 자동 조절 */
 @media (max-width: 768px) {
     h1 { 
-        font-size: 22px !important; /* 숫자를 조절하여 크기를 맞출 수 있습니다 (기본은 약 36px) */
+        font-size: 22px !important; 
         padding-top: 1rem !important;
     }
     h3 {
-        font-size: 12px !important; /* 👈 이 숫자를 14px 등으로 더 줄이시면 됩니다! */
+        font-size: 12px !important; 
     }
 }
 </style>
