@@ -11,6 +11,13 @@ st.markdown("""
 /* 💡 [추가] 우측 상단 툴바 및 메뉴 완전히 숨기기 */
 [data-testid="stToolbar"] {visibility: hidden !important;}
 
+/* 💡 [추가] 좌측 메뉴 열기(>) 버튼과 상단 헤더가 스크롤 시 사라지지 않도록 영구 고정 */
+[data-testid="collapsedControl"], [data-testid="stHeader"] {
+    opacity: 1 !important;
+    transform: none !important;
+    z-index: 999999 !important; 
+}
+
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -20,6 +27,9 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
     h1 { 
         font-size: 22px !important; /* 숫자를 조절하여 크기를 맞출 수 있습니다 (기본은 약 36px) */
         padding-top: 1rem !important;
+    }
+    h3 {
+        font-size: 12px !important; /* 👈 이 숫자를 14px 등으로 더 줄이시면 됩니다! */
     }
 }
 </style>
@@ -161,6 +171,28 @@ try:
     st.markdown("---")
     with st.expander("🔍 클라우드 서버 원본 데이터 상세 보기"):
         st.dataframe(filtered_df)
+
+    # =======================================================
+    # 💡 [여기에 새로 추가!] 데이터 측정 기준 안내 토글 (Expander)
+    # =======================================================
+    with st.expander("ℹ️ 데이터 측정 기준"):
+        st.markdown("""
+        **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
+        
+        코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
+
+        **⚙️ 작동 방식**
+        1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
+        2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
+        3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
+       
+        **📊 장비별 수집 조건 (필터링 로직)**
+        1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
+        2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
+
+        **🖥️ 대시보드 연동**
+        수집 로봇이 클라우드에 적재한 CSV 원본 데이터는, 현재 배포된 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다. 내부 동적 시각화 엔진(Plotly)을 거쳐 24시간 언제 어디서든 PC와 스마트폰으로 최신 온습도 현황을 즉시 관제할 수 있습니다.
+        """)
 
     # ==========================================
     # 💡 [요청 반영] 우측 하단 만든 사람 및 문의처 표시
