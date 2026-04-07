@@ -114,8 +114,10 @@ try:
             st.stop()
 
         filtered_df = df[(df[COL_DEVICE].isin(selected_devices)) & (df[COL_TIME].dt.year.isin(s_y)) & (df[COL_TIME].dt.month.isin(s_m)) & (df[COL_TIME].dt.day.isin(s_d)) & (df[COL_TIME].dt.hour.isin(s_h))]
-        plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) == len(device_list) else filtered_df.copy()
-        plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) == len(device_list) else plot_df[COL_DEVICE]
+        
+        # 👇 'len(device_list)' 부분을 '2'로, '==' 를 '>=' 로 변경했습니다! 👇
+        plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) >= 2 else filtered_df.copy()
+        plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) >= 2 else plot_df[COL_DEVICE]
 
         if plot_df.empty:
             st.warning("해당 조건에 맞는 데이터가 없습니다.")
