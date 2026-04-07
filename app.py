@@ -3,44 +3,49 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정
-st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
+# 1. 페이지 설정 (사이드바 상태 추가)
+st.set_page_config(
+    page_title="COREBUILD 클라우드 온습도", 
+    layout="wide",
+    initial_sidebar_state="collapsed" # 👈 화살표 버튼을 강제로 소환하는 핵심 설정!
+)
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바(Deploy, 세로점3개 등) 및 하단 종이배 완벽 제거 */
+/* 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 완벽 박멸 */
 [data-testid="stToolbar"], [data-testid="stDecoration"], footer, [data-testid="stStatusWidget"] {
     display: none !important;
+    visibility: hidden !important;
 }
 
-/* 2. ✅ 좌측 상단 화살표(>) 버튼 - 위치와 가시성 절대 고정 */
+/* 2. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 지표면 위로 강제 인양 */
 [data-testid="collapsedControl"] {
     display: flex !important;
     visibility: visible !important;
     position: fixed !important;
-    top: 0px !important;  /* 최상단 */
-    left: 10px !important; /* 왼쪽 살짝 띄움 */
-    z-index: 9999999 !important; /* 모든 것보다 위에 */
-    background-color: transparent !important;
-    width: 50px !important;
-    height: 50px !important;
+    top: 15px !important;   /* 위치를 살짝 아래로 내려서 더 잘 보이게 함 */
+    left: 15px !important;  /* 왼쪽 여백 확보 */
+    z-index: 99999999 !important; /* 모든 레이어의 왕 */
+    background-color: rgba(255, 255, 255, 0.2) !important; /* 살짝 밝은 배경을 넣어 버튼 강조 */
+    border-radius: 50% !important;
 }
 
-/* 3. ✅ 부장님이 직접 고르신 '빨간색(Red)' 아이콘 강제 적용 */
+/* 3. ✅ 부장님의 Red 아이콘 - 그림자까지 넣어서 더 선명하게 */
 [data-testid="collapsedControl"] svg {
     fill: red !important;
     color: red !important;
-    width: 35px !important; /* 모바일에서도 잘 보이게 조금 키움 */
-    height: 35px !important;
+    width: 30px !important;
+    height: 30px !important;
+    filter: drop-shadow(0px 0px 3px rgba(255, 0, 0, 0.5)) !important;
 }
 
-/* 4. 버튼을 가리고 있던 헤더의 배경만 지우고 높이를 확보함 */
+/* 4. 투명 헤더가 버튼 클릭을 방해하지 못하도록 높이 제거 */
 header[data-testid="stHeader"] {
+    height: 0px !important;
     background: transparent !important;
-    height: 0px !important; /* 헤더가 본문을 가리지 않게 함 */
 }
 
-/* 기존 부장님 설정값 유지 */
+/* 기존 부장님 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -48,7 +53,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
-        padding-top: 3rem !important; /* 빨간 화살표와 겹치지 않게 본문 더 내림 */
+        padding-top: 3.5rem !important; /* 빨간 버튼과 겹치지 않게 본문 더 내림 */
     }
     h3 {
         font-size: 12px !important; 
