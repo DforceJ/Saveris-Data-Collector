@@ -79,7 +79,7 @@ try:
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
         # 1. 'st.header'를 'st.markdown'으로 바꾸고 앞에 '###' 추가
-        st.markdown("### 🔍 데이터 필터") 
+        st.markdown("##### 🔍 데이터 필터") 
         
         selected_devices = []
         with st.expander("✅ 측정 위치", expanded=True):
@@ -90,7 +90,7 @@ try:
         st.markdown("---")
         
         # 2. 'st.subheader'를 'st.markdown'으로 바꾸고 앞에 '####' 추가
-        st.markdown("#### 📅 측정 일자 및 시간")
+        st.markdown("##### 📅 측정 일자 및 시간")
         
         def render_filter(label, item_list, key_p):
             sel = []
