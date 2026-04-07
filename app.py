@@ -12,27 +12,15 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ✅ 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘 안전하게 제거 */
-[data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
+/* ✅ 1. 방해물만 제거: 우측 상단 툴바, Deploy 버튼, 하단 빨간 배(Manage app) */
+[data-testid="stToolbar"], .stAppDeployButton, [data-testid="stStatusWidget"], footer {
     display: none !important;
-    visibility: hidden !important;
 }
 
-/* ✅ 2. 좌측 메뉴 열기(>) 버튼과 상단 헤더가 스크롤 시 사라지지 않도록 영구 고정 (부장님 원본 복구) */
-[data-testid="collapsedControl"], [data-testid="stHeader"] {
-    opacity: 1 !important;
-    transform: none !important;
-    z-index: 999999 !important; 
-    background: transparent !important; /* 헤더 배경만 투명하게 */
-}
+/* 🚨 화살표 버튼과 상단 헤더를 억지로 건드리는 '모든 CSS'를 전면 폐기했습니다! (순정 상태 유지) 🚨 */
+/* 스트림릿이 알아서 라이트/다크 모드에 맞춰 가장 잘 보이는 색으로 화살표를 그려줄 것입니다. */
 
-/* ✅ 3. 메뉴 열기(>) 버튼 색상을 부장님표 '빨간색(Red)'으로 강제 적용 */
-[data-testid="collapsedControl"] svg {
-    color: red !important;
-    fill: red !important;
-}
-
-/* ✅ 4. 부장님 디테일 설정값 (절대 유지) */
+/* ✅ 2. 부장님의 디테일 텍스트 설정 (안전한 코드만 남김) */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -43,7 +31,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
         padding-top: 1rem !important;
     }
     h3 {
-        font-size: 12px !important; /* 부장님 설정값 12px 유지 */
+        font-size: 12px !important; 
     }
 }
 </style>
