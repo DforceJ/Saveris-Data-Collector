@@ -12,40 +12,28 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바 및 하단 빨간 배(Manage app) 아이콘 완전히 제거 */
-[data-testid="stToolbar"], [data-testid="stDecoration"], footer, [data-testid="stStatusWidget"] {
+/* 1. 우측 상단 툴바(Deploy) 및 하단 빨간 배(Manage app) 아이콘 완전히 제거 */
+/* 복잡한 코드 다 빼고 가장 확실한 태그만 숨깁니다. */
+[data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
     display: none !important;
-    visibility: hidden !important;
 }
 
-/* 2. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 헤더에서 탈출시켜서 화면에 고정 */
-[data-testid="collapsedControl"] {
-    display: flex !important;
-    visibility: visible !important;
-    position: fixed !important;
-    top: 10px !important;
-    left: 10px !important;
-    z-index: 9999999 !important;
-    background-color: rgba(255, 255, 255, 0.1) !important; /* 약간의 배경을 넣어 버튼 영역 확보 */
-    border-radius: 10px !important;
-    padding: 5px !important;
-}
-
-/* 3. ✅ 부장님께서 지정하신 빨간색(Red) 화살표 아이콘 강제 적용 */
-[data-testid="collapsedControl"] svg {
-    fill: red !important;
-    color: red !important;
-    width: 28px !important;
-    height: 28px !important;
-}
-
-/* 4. 헤더를 없애는 대신 투명하게 만들어 버튼이 클릭되도록 함 */
+/* 2. 상단 헤더의 배경만 투명하게 만듦 (헤더 자체를 지우면 화살표도 같이 죽습니다!) */
 header[data-testid="stHeader"] {
-    background-color: rgba(0,0,0,0) !important;
-    color: rgba(0,0,0,0) !important;
+    background: transparent !important;
 }
 
-/* 기존 부장님 설정값 (폰트 등) 사수 */
+/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 - 순정 상태에서 빨간색(Red)만 입히기 */
+[data-testid="collapsedControl"] button {
+    color: red !important; /* 버튼 색상 빨간색 */
+}
+[data-testid="collapsedControl"] svg {
+    fill: red !important;  /* 아이콘 색상 빨간색 */
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* 4. 기존 부장님 설정값 (폰트 등) 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -53,10 +41,10 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 20px !important; 
-        padding-top: 3rem !important; 
+        padding-top: 2rem !important; 
     }
     h3 {
-        font-size: 12px !important; /* 부장님 설정값 유지 */
+        font-size: 12px !important; /* 부장님 설정값 12px 유지 */
     }
 }
 </style>
