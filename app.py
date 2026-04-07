@@ -8,32 +8,39 @@ st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
 st.markdown("""
 <style>
-/* 1. 우측 상단 툴바 및 메뉴 숨기기 */
-[data-testid="stToolbar"] {visibility: hidden !important;}
+/* 1. 우측 상단 툴바(Deploy 버튼 등) 완전히 제거 */
+.stAppDeployButton, [data-testid="stToolbar"] {
+    display: none !important;
+}
 
-/* 2. ✅ [추가] 우측 하단 빨간 종이배 아이콘 및 푸터 완전히 숨기기 */
-footer {display: none !important;}
-[data-testid="stStatusWidget"] {display: none !important;}
+/* 2. ✅ 우측 하단 빨간 종이배(Manage app) 및 하단 푸터 완벽 제거 */
+footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
+    display: none !important;
+}
 
-/* 3. ✅ [개선] 모바일 좌측 화살표(>) 강제 표시 및 고정 */
+/* 3. ✅ 좌측 상단 메뉴 열기(>) 버튼 강제 소환 및 색상 고정 */
+/* 버튼이 배경에 묻히지 않도록 흰색으로 강제하고 위치를 고정합니다. */
 [data-testid="collapsedControl"] {
-    display: flex !important; /* '안 보임' 상태를 강제로 '보임'으로 변경 */
+    display: flex !important;
     visibility: visible !important;
-    z-index: 1000000 !important; /* 가장 최상단으로 올림 */
-    opacity: 1 !important;
+    z-index: 999999 !important;
 }
 
-/* 4. 상단 헤더 투명화 및 화살표 버튼 위치 확보 */
-[data-testid="stHeader"] {
+[data-testid="collapsedControl"] button {
+    color: red !important; /* 화살표 색상을 빨간색으로 고정 */
+}
+
+/* 4. 상단 헤더 영역이 버튼을 가리지 않도록 투명화 */
+header[data-testid="stHeader"] {
     background: transparent !important;
-    display: block !important;
 }
 
+/* 기존 부장님 설정값 유지 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
-/* 모바일 화면(폭 768px 이하)에서 글자 크기 자동 조절 */
+/* 모바일 화면(폭 768px 이하) 설정 */
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
