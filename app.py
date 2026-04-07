@@ -3,33 +3,48 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (사이드바 상시 열림 상태로 고정)
+# 1. 페이지 설정 (사이드바 상시 열림)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
-    initial_sidebar_state="expanded" # 사이드바를 무조건 열어둡니다.
+    initial_sidebar_state="expanded" 
 )
 
 st.markdown("""
 <style>
-/* 🚀 1. 가장 완벽한 방해물 제거 (빨간 배, 노란 로고, Deploy 버튼, 상단 여백) */
-/* 헤더와 푸터, 스트림릿 고유 뱃지들을 화면에서 완전히 도려냅니다. */
-header, footer, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .viewerBadge_container__1QSob, [class^="viewerBadge_"] {
+/* 🚀 1. 방해물 완벽 철거 (빨간 배, 상단 헤더, 로고 등) */
+header[data-testid="stHeader"], 
+footer, 
+[data-testid="stToolbar"], 
+[data-testid="stDecoration"], 
+[data-testid="stStatusWidget"], 
+[class^="viewerBadge_"] {
     display: none !important;
-    visibility: hidden !important;
 }
 
-/* 🚀 2. 🚨 부장님 아이디어 적용: 사이드바 닫기(<<) 및 열기(>) 버튼 영구 삭제 🚨 */
-/* 사용자가 실수로라도 필터 창을 닫을 수 없도록 버튼 자체를 화면에서 지워버립니다. */
+/* 🚀 2. 🚨 최후의 처방: 닫기(<<) 버튼이 사는 '사이드바 헤더' 구역 자체를 폭파시킴 🚨 */
+/* 이 구역을 날려버리면 스트림릿이 닫기 버튼을 아예 화면에 그릴 수 없습니다. */
+[data-testid="stSidebarHeader"] {
+    display: none !important;
+    height: 0px !important;
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+/* 혹시 모를 좀비 버튼들을 위한 3중 방어막 */
 [data-testid="stSidebarCollapseButton"], 
 [data-testid="collapsedControl"],
 [data-testid="stSidebarCollapsedControl"] {
     display: none !important;
+    opacity: 0 !important;
+    width: 0px !important;
+    height: 0px !important;
+    pointer-events: none !important;
 }
 
-/* 🚀 3. 헤더가 사라진 빈 자리에 본문이 예쁘게 자리잡도록 여백 추가 */
+/* 🚀 3. 상단 공간 확보 */
 .block-container {
-    padding-top: 3rem !important;
+    padding-top: 2rem !important;
 }
 
 /* ✅ 4. 부장님 디테일 설정값 절대 사수 */
