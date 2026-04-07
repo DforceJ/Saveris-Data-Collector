@@ -3,27 +3,31 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정 (사이드바는 기기 화면 크기에 맞춰 자동으로 열리고 닫히도록 설정)
+# 1. 페이지 설정 (초기에는 사이드바가 열려 있도록 설정)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
-    initial_sidebar_state="auto" 
+    initial_sidebar_state="expanded" 
 )
 
 st.markdown("""
 <style>
-/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, Manage App 빨간 배, 기본 메뉴) */
+/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, Manage App 빨간 배, 기본 툴바) */
 .stAppDeployButton, [data-testid="stToolbar"], [data-testid="stStatusWidget"], footer {
     display: none !important;
-    visibility: hidden !important;
 }
 
-/* ✅ 2. 🚨 핵심 해결: 모바일 스크롤 시 버튼이 숨지 않도록 헤더를 영구 고정 */
-header[data-testid="stHeader"] {
-    transform: none !important; /* 스크롤 시 위로 도망가는 애니메이션 강제 취소 */
-    background: transparent !important; 
+/* ✅ 2. 🚨 핵심 처방: 숨어버린 화살표(>) 버튼 구출 작전 🚨 */
+/* 사이드바를 닫았을 때 나타나는 버튼을 맨 앞으로 당기고, 크기를 키워 빨간색으로 고정합니다. */
+[data-testid="collapsedControl"] {
+    z-index: 999999 !important; /* 화면 최상단으로 끌어올림 */
 }
-/* ❌ 주의: 이전처럼 화살표 버튼 자체의 색상이나 위치를 억지로 건드리는 코드는 모두 삭제했습니다. */
+[data-testid="collapsedControl"] svg {
+    color: #FF4B4B !important; /* 눈에 확 띄는 스트림릿 레드 색상 */
+    fill: #FF4B4B !important;
+    width: 2rem !important;    /* 버튼 크기를 약간 키워서 클릭하기 쉽게 함 */
+    height: 2rem !important;
+}
 
 /* ✅ 3. 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
@@ -36,7 +40,7 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
         padding-top: 1rem !important; 
     }
     h3 {
-        font-size: 12px !important; /* 부장님 설정 12px 유지 */
+        font-size: 12px !important; 
     }
 }
 </style>
