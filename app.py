@@ -3,48 +3,36 @@ import pandas as pd
 import plotly.express as px
 from datetime import timedelta
 
-# 1. 페이지 설정
+# 1. 페이지 설정 (사이드바 상시 열림 상태로 고정)
 st.set_page_config(
     page_title="COREBUILD 클라우드 온습도", 
     layout="wide",
-    initial_sidebar_state="expanded" 
+    initial_sidebar_state="expanded" # 사이드바를 무조건 열어둡니다.
 )
 
 st.markdown("""
 <style>
-/* ✅ 1. 방해물 완벽 철거 (Deploy 버튼, 하단 빨간 배, 기본 툴바) */
-[data-testid="stToolbar"], 
-[data-testid="stStatusWidget"], 
-.stAppDeployButton, 
-footer {
+/* 🚀 1. 가장 완벽한 방해물 제거 (빨간 배, 노란 로고, Deploy 버튼, 상단 여백) */
+/* 헤더와 푸터, 스트림릿 고유 뱃지들을 화면에서 완전히 도려냅니다. */
+header, footer, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .viewerBadge_container__1QSob, [class^="viewerBadge_"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* 🚀 2. 🚨 부장님 아이디어 적용: 사이드바 닫기(<<) 및 열기(>) 버튼 영구 삭제 🚨 */
+/* 사용자가 실수로라도 필터 창을 닫을 수 없도록 버튼 자체를 화면에서 지워버립니다. */
+[data-testid="stSidebarCollapseButton"], 
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"] {
     display: none !important;
 }
 
-/* 🚀 2. 핵심: 사이드바 열기(>) 버튼 강제 소환 (최신 업데이트 이름까지 타겟팅) 🚀 */
-/* 이전 이름(collapsedControl)과 새 이름(stSidebarCollapsedControl) 모두에 빨간색 강제 적용 */
-[data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 999999 !important;
-    background-color: rgba(255, 0, 0, 0.1) !important; /* 버튼 주변에 옅은 빨간 네모 배경을 깔아 무조건 보이게 함 */
-    border-radius: 5px !important;
-    padding: 5px !important;
-    margin-top: 5px !important;
-    margin-left: 5px !important;
+/* 🚀 3. 헤더가 사라진 빈 자리에 본문이 예쁘게 자리잡도록 여백 추가 */
+.block-container {
+    padding-top: 3rem !important;
 }
 
-/* 화살표 아이콘을 크고 진한 빨간색으로! */
-[data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-    color: red !important;
-    fill: red !important;
-    width: 30px !important;
-    height: 30px !important;
-}
-
-/* ✅ 3. 부장님 디테일 설정 사수 */
+/* ✅ 4. 부장님 디테일 설정값 절대 사수 */
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
@@ -52,10 +40,12 @@ div[data-testid="stExpander"] label p { font-size: 13px !important; }
 @media (max-width: 768px) {
     h1 { 
         font-size: 22px !important; 
-        padding-top: 1rem !important; 
     }
     h3 {
         font-size: 12px !important; 
+    }
+    .block-container {
+        padding-top: 1rem !important;
     }
 }
 </style>
