@@ -137,7 +137,8 @@ try:
             fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
             fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
             fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            fig_t.update_layout(yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
+            # 👇 여기에 showlegend=False, 를 추가했습니다! 👇
+            fig_t.update_layout(showlegend=False, yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             st.plotly_chart(fig_t, use_container_width=True)
 
@@ -147,7 +148,8 @@ try:
             fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
             fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
             fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            fig_h.update_layout(yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
+            # 👇 여기에도 showlegend=False, 를 추가했습니다! 👇
+            fig_h.update_layout(showlegend=False, yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             st.plotly_chart(fig_h, use_container_width=True)
 
