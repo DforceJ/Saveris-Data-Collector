@@ -8,9 +8,20 @@ st.set_page_config(page_title="COREBUILD 클라우드 온습도", layout="wide")
 
 st.markdown("""
 <style>
+/* 💡 [추가] 우측 상단 툴바 및 메뉴 완전히 숨기기 */
+[data-testid="stToolbar"] {visibility: hidden !important;}
+
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
 .stCheckbox label p { font-size: 13px !important; }
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
+
+/* 💡 [신규 추가] 모바일 화면(폭 768px 이하)에서 메인 제목 크기 줄이기 */
+@media (max-width: 768px) {
+    h1 { 
+        font-size: 22px !important; /* 숫자를 조절하여 크기를 맞출 수 있습니다 (기본은 약 36px) */
+        padding-top: 1rem !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
