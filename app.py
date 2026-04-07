@@ -121,24 +121,6 @@ try:
             st.warning("해당 조건에 맞는 데이터가 없습니다.")
             st.stop()
 
-        st.markdown("### ⏱️ 측정 일자 및 시간 범위 정밀 조절")
-        min_t = plot_df[COL_TIME].min().to_pydatetime()
-        max_t = plot_df[COL_TIME].max().to_pydatetime()
-        
-        if min_t != max_t:
-            col_slider, _ = st.columns([1, 4]) 
-            with col_slider:
-                sel_time = st.slider(
-                    "기간 조절", 
-                    min_value=min_t, 
-                    max_value=max_t, 
-                    value=(min_t, max_t), 
-                    format="MM/DD HH:mm", 
-                    step=timedelta(hours=1), 
-                    label_visibility="collapsed"
-                )
-            plot_df = plot_df[(plot_df[COL_TIME] >= sel_time[0]) & (plot_df[COL_TIME] <= sel_time[1])]
-
         display_count = 10 
         step_lbl = max(1, len(plot_df) // display_count)
         plot_df['T_L'] = [str(round(v, 1)) if i % step_lbl == 0 else "" for i, v in enumerate(plot_df[COL_TEMP])]
