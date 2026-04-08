@@ -142,12 +142,8 @@ try:
             fig_h.update_layout(showlegend=False, yaxis=dict(range=[20, 70], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             event_h = st.plotly_chart(fig_h, use_container_width=True, on_select="rerun", selection_mode="points")
-
-         # =================================================================
-        # 💡 [요청하신 기능] 측정 위치 선택에 따른 그래프 표현 안내 문구 추가
-        # =================================================================
-        st.info("💡 **그래프 표시 안내:** 측정 위치(장치) 1~2개 선택 시 위치별 [상대 비교]가 가능하며, 3개 이상(전체 포함) 선택 시 전체 추이 파악을 위해 [전체 평균]으로 그래프가 보여집니다.")
-        # =================================================================
+ 
+        st.markdown("<p style='color: #888888; font-size: 14px;'>💡 <b>그래프 표시 안내:</b> 측정 위치(장치)를 1~2개 선택 시 위치별 [상대 비교]가 가능하며, 3개 이상(전체 포함) 선택 시 전체 추이 파악을 위해 <b>[전체 평균]</b>으로 그래프가 보여집니다.</p>", unsafe_allow_html=True)
 
         st.markdown("---")
         
@@ -173,11 +169,11 @@ try:
                     # 인덱스(1, 2, 3...)를 숨기고 깔끔한 표로 출력
                     st.dataframe(detail_df, use_container_width=True, hide_index=True)
                 else:
-                    st.info("해당 시간의 상세 데이터가 없습니다.")
+                    st.markdown("<p style='color: #888888; font-size: 14px;'>해당 시간의 상세 데이터가 없습니다.</p>", unsafe_allow_html=True)
             except Exception as e:
                 st.error("데이터를 불러오는 중 오류가 발생했습니다.")
         else:
-            st.info("👆 위 그래프의 동그란 타점(점)을 클릭하시면, 해당 시간의 상세 데이터가 이곳에 표시됩니다.")
+            st.markdown("<p style='color: #888888; font-size: 14px;'>👆 위 그래프의 동그란 타점(점)을 클릭하시면, 해당 시간의 상세 데이터가 이곳에 표시됩니다.</p>", unsafe_allow_html=True)
 
 
         with st.expander("🔍 클라우드 서버 전체 원본 데이터 보기"):
