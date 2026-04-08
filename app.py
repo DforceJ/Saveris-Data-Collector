@@ -66,7 +66,7 @@ try:
         for item in target_list: st.session_state[f"{key_prefix}_{item}"] = st.session_state[master_key]
 
     # 화면을 좌측(0.5)과 우측(3.5)으로 분할
-    col_filter, col_main = st.columns([0.3, 3.7])
+    col_filter, col_main = st.columns([1, 7])
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
