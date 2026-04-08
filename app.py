@@ -143,7 +143,7 @@ try:
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             event_h = st.plotly_chart(fig_h, use_container_width=True, on_select="rerun", selection_mode="points")
  
-         st.markdown("<p style='color: #888888; font-size: 16px;'>💡 <b>그래프 표시 안내:</b> 측정 위치(장치)를 1~2개 선택 시 위치별 <b>[상대 비교]</b>가 가능하며, 3개 이상(전체 포함) 선택 시 전체 추이 파악을 위해 <b>[전체 평균]</b>으로 그래프가 보여집니다.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #888888; font-size: 16px;'>💡 <b>그래프 표시 안내:</b> 측정 위치(장치)를 1~2개 선택 시 위치별 <b>[상대 비교]</b>가 가능하며, 3개 이상(전체 포함) 선택 시 전체 추이 파악을 위해 <b>[전체 평균]</b>으로 그래프가 보여집니다.</p>", unsafe_allow_html=True)
 
         st.markdown("---")
         
