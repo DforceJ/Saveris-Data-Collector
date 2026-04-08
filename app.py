@@ -73,7 +73,7 @@ try:
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
-        st.markdown("##### 🔍 데이터 필터")
+        st.markdown("###### 🔍 데이터 필터")
         selected_devices = []
         with st.expander("✅ 측정 위치", expanded=True):
             st.checkbox("전체 선택/해제", key="m_dev", on_change=toggle_all, args=("dev", device_list, "m_dev"))
@@ -81,7 +81,7 @@ try:
                 if st.checkbox(d, key=f"dev_{d}"): selected_devices.append(d)
 
         st.markdown("---")
-        st.markdown("##### 📅 측정 일자/시간")
+        st.markdown("###### 📅 측정 일자/시간")
         
         def render_filter(label, item_list, key_p):
             sel = []
@@ -148,7 +148,7 @@ try:
         # =================================================================
         # 🎯 [추가된 기능] 클릭한 타점의 상세 데이터를 표로 보여주는 영역
         # =================================================================
-        st.markdown("##### 🎯 선택된 타점 상세 데이터")
+        st.markdown("###### 🎯 선택된 타점 상세 데이터")
         
         selected_time = None
         # 온도 그래프에서 클릭한 경우 시간 가져오기
