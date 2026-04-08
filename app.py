@@ -66,7 +66,7 @@ try:
         for item in target_list: st.session_state[f"{key_prefix}_{item}"] = st.session_state[master_key]
 
     # 화면을 좌측(0.5)과 우측(3.5)으로 분할
-    col_filter, col_main = st.columns([0.5, 3.5])
+    col_filter, col_main = st.columns([1, 3])
 
     # ------------------ 좌측: 데이터 필터 영역 ------------------
     with col_filter:
@@ -104,8 +104,8 @@ try:
         filtered_df = df[(df[COL_DEVICE].isin(selected_devices)) & (df[COL_TIME].dt.year.isin(s_y)) & (df[COL_TIME].dt.month.isin(s_m)) & (df[COL_TIME].dt.day.isin(s_d)) & (df[COL_TIME].dt.hour.isin(s_h))]
         
         # 2개 이상 선택 시 전체 평균으로 묶기
-        plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) >= 2 else filtered_df.copy()
-        plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) >= 2 else plot_df[COL_DEVICE]
+        plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) >= 3 else filtered_df.copy()
+        plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) >= 3 else plot_df[COL_DEVICE]
 
         if plot_df.empty:
             st.warning("해당 조건에 맞는 데이터가 없습니다.")
@@ -126,7 +126,7 @@ try:
             fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
             fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
             fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            fig_t.update_layout(showlegend=False, yaxis=dict(range=[18, 32], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
+            fig_t.update_layout(showlegend=False, yaxis=dict(range=[16, 34], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             event_t = st.plotly_chart(fig_t, use_container_width=True, on_select="rerun", selection_mode="points")
 
@@ -136,7 +136,7 @@ try:
             fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
             fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
             fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
-            fig_h.update_layout(showlegend=False, yaxis=dict(range=[25, 65], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
+            fig_h.update_layout(showlegend=False, yaxis=dict(range=[20, 70], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
             event_h = st.plotly_chart(fig_h, use_container_width=True, on_select="rerun", selection_mode="points")
 
