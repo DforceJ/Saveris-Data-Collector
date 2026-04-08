@@ -24,7 +24,10 @@ footer {visibility: hidden;}
 }
 
 div[data-testid="stExpander"] label p { font-size: 13px !important; }
-.stCheckbox label p { font-size: 13px !important; }
+.stCheckbox label p { 
+    font-size: 13px !important;
+    white-space: nowrap !important; /* 👈 글자가 좁아도 무조건 한 줄로 유지하게 만듭니다 */        
+}
 .stCheckbox:first-child label p { font-weight: bold; color: #FFD700; }
 
 @media (max-width: 768px) {
@@ -179,9 +182,23 @@ try:
 
         with st.expander("ℹ️ 데이터 측정 기준"):
             st.markdown("""
-            **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템**
-            코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
-            """)
+        **🌡️ 코어빌드 온습도 데이터 자동 수집 시스템 데이터 측정 기준**
+        
+        코어빌드 회로/기구자재 창고 및 생산라인, IQC, OQC 온습도 데이터를 매 시간 자동으로 수집하여 저장하는 시스템입니다.
+
+        **⚙️ 작동 방식**
+        1. **수집 주기:** 매 시간마다 GitHub Actions 로봇이 자동으로 실행됩니다.
+        2. **실행 스크립트:** `saveris_auto_collector.py` (파이썬)
+        3. **결과 저장소:** GitHub 클라우드의 `Saveris_Data.csv` 파일에 데이터가 누적됩니다.
+        4. **실행 감시 (Health Check):** GitHub Actions의 서버 상태에 따른 실행 지연(로봇 지각)을 감시하기 위해 **외부 모니터링 알람**이 설정되어 있습니다.
+
+        **📊 장비별 수집 조건 (필터링 로직)**
+        1. **A, B 장비 (회로자재 창고):** 24시간 상시 수집
+        2. **C, D, E, F, G 장비:** 휴일을 제외한 근무 시간 (09:00 ~ 17:00) 데이터만 수집
+
+        **🖥️ 대시보드 연동**
+        수집 로봇이 적재한 CSV 원본 데이터는 **코어빌드 자체 클라우드 관제 대시보드(Streamlit)** 서버와 실시간으로 연동되어 있습니다.
+        """)
 
         st.markdown(
             f"""
