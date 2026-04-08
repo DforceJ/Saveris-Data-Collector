@@ -126,8 +126,13 @@ try:
         with col_g1:
             fig_t = px.line(plot_df, x=COL_TIME, y=COL_TEMP, color=COL_DEVICE, text='T_L', 
                             markers=True, title="📈 실시간 온도 현황", line_shape='spline')
+            
+            # 👇 새로 추가된 분홍색 선 (32℃, 18℃)
+            fig_t.add_hline(y=32, line_dash="dot", line_color="pink", annotation_text="최상한(32℃)")
             fig_t.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="상한(30℃)")
             fig_t.add_hline(y=20, line_dash="dash", line_color="red", annotation_text="하한(20℃)")
+            fig_t.add_hline(y=18, line_dash="dot", line_color="pink", annotation_text="최하한(18℃)")
+            
             fig_t.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
             fig_t.update_layout(showlegend=False, yaxis=dict(range=[16, 34], dtick=2, autorange=False, fixedrange=True, title="온도 (℃)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
@@ -136,8 +141,13 @@ try:
         with col_g2:
             fig_h = px.line(plot_df, x=COL_TIME, y=COL_HUMI, color=COL_DEVICE, text='H_L', 
                             markers=True, title="💧 실시간 습도 현황", line_shape='spline')
+            
+            # 👇 새로 추가된 분홍색 선 (65%, 25%)
+            fig_h.add_hline(y=65, line_dash="dot", line_color="pink", annotation_text="최상한(65%)")
             fig_h.add_hline(y=60, line_dash="dash", line_color="red", annotation_text="상한(60%)")
             fig_h.add_hline(y=30, line_dash="dash", line_color="red", annotation_text="하한(30%)")
+            fig_h.add_hline(y=25, line_dash="dot", line_color="pink", annotation_text="최하한(25%)")
+            
             fig_h.update_traces(textposition="top center", textfont_size=15, line_width=2, marker_size=10)
             fig_h.update_layout(showlegend=False, yaxis=dict(range=[20, 70], dtick=5, autorange=False, fixedrange=True, title="습도 (%rF)"),
                                 xaxis=dict(tickformat=x_fmt, title="측정시간"))
