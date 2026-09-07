@@ -25,6 +25,8 @@ print(f"▶ 봇 실행 시간: {now_kst.strftime('%Y-%m-%d %H:%M:%S')}")
 
 # 3. 장비 목록 가져오기
 points_response = requests.get(f"{BASE_URL}/saveris/v1/measuringPoint", headers=HEADERS)
+print("▶ 1차 응답 코드:", points_response.status_code)
+print("▶ 1차 응답 내용:", points_response.text[:1000])
 if points_response.status_code != 200:
     print("❌ 장비 목록 조회 실패")
     exit()
