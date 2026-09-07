@@ -109,6 +109,7 @@ try:
         # 2개 이상 선택 시 전체 평균으로 묶기
         plot_df = filtered_df.groupby(COL_TIME, as_index=False)[[COL_TEMP, COL_HUMI]].mean() if len(selected_devices) >= 3 else filtered_df.copy()
         plot_df[COL_DEVICE] = '전체 평균' if len(selected_devices) >= 3 else plot_df[COL_DEVICE]
+        plot_df = plot_df.sort_values(by=COL_TIME).reset_index(drop=True)  # ⭐ 추가: 시간순 정렬
 
         if plot_df.empty:
             st.warning("해당 조건에 맞는 데이터가 없습니다.")
@@ -177,7 +178,7 @@ try:
                 
                 if not detail_df.empty:
                     # 인덱스(1, 2, 3...)를 숨기고 깔끔한 표로 출력
-                    st.dataframe(detail_df, use_container_width=True, hide_index=True)
+                    st.dataframe(detail_df.sort_values(by=COL_DEVICE), use_container_width=True, hide_index=True)  # ⭐ 수정: 장비명순 정렬
                 else:
                     st.markdown("<p style='color: #888888; font-size: 14px;'>해당 시간의 상세 데이터가 없습니다.</p>", unsafe_allow_html=True)
             except Exception as e:
@@ -187,7 +188,7 @@ try:
 
 
         with st.expander("🔍 클라우드 서버 전체 원본 데이터 보기"):
-            st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+            st.dataframe(filtered_df.sort_values(by=[COL_TIME, COL_DEVICE]), use_container_width=True, hide_index=True)  # ⭐ 수정: 시간+장비명순 정렬
 
         with st.expander("ℹ️ 데이터 측정 기준"):
             st.markdown("""
