@@ -75,8 +75,8 @@ raw_df = pd.read_csv(StringIO(csv_text))
 print("▶ 수신된 CSV 컬럼:", list(raw_df.columns))
 print("▶ 샘플 데이터:")
 print(raw_df.head(3).to_string())
-print("▶ 존재하는 물리량 조합:")
-print(raw_df[['physical_property_name', 'physical_unit']].drop_duplicates().to_string())
+#print("▶ 존재하는 물리량 조합:")
+#print(raw_df[['physical_property_name', 'physical_unit']].drop_duplicates().to_string())
 
 # ===================== 5. 장비 일련번호 → 이름 매핑 (고정 테이블) =====================
 SERIAL_TO_NAME = {
