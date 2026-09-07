@@ -1,11 +1,8 @@
 name: Hourly Saveris Data Collector
-
-on:
 on:
   schedule:
    - cron: '0 * * * *'    # 매 정시(1시간마다) 자동 실행
   workflow_dispatch:     # 내가 원할 때 버튼을 눌러서 수동 실행 가능하게 함
-
 jobs:
   build:
     runs-on: ubuntu-latest
