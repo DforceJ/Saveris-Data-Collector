@@ -78,33 +78,30 @@ print(raw_df.head(3).to_string())
 print("▶ 존재하는 물리량 조합:")
 print(raw_df[['physical_property_name', 'physical_unit']].drop_duplicates().to_string())
 
-# ===================== 5. 컬럼명 매핑 (⚠️ 4번 로그 확인 후 실제 값으로 수정 필요) =====================
-COL_TIME = "measured_at"
-COL_NAME = "measuring_object_name"
-COL_VALUE = "physical_value"
-COL_UNIT = "physical_unit"
+# ===================== 5. 장비 일련번호 → 이름 매핑 (고정 테이블) =====================
+SERIAL_TO_NAME = {
+    "54837117": "A-(401호 회로창고 1)",
+    "54837300": "B-(401호 회로창고 2)",
+    "54801498": "C-(402호 수입검사)",
+    "54837204": "D-(406호 기구창고)",
+    "54801450": "E-(408호 OQC)",
+    "54829227": "F-(807호 생산 Line)",
+    "54837103": "G-(401호 기구창고)",
+}
 
-missing_cols = [c for c in [COL_TIME, COL_NAME, COL_VALUE, COL_UNIT] if c not in raw_df.columns]
-if missing_cols:
-    print(f"❌ 예상 컬럼이 CSV에 없습니다: {missing_cols}")
-    print("▶ 위 4번 로그의 실제 컬럼명으로 이 섹션을 수정해 주세요.")
-    exit()
-
-# ===================== 6. 조건부 필터링 및 그룹핑 (측정값 자체 시각 기준) =====================
+# ===================== 6. 조건부 필터링 및 그룹핑 =====================
 grouped_data = {}
 
 for _, row in raw_df.iterrows():
-    full_name = str(row[COL_NAME]).strip()
-    match = re.search(r'^([A-Z])-\(.*?\)', full_name)
-    if not match:
-        continue
+    serial = str(row["serial_no"])
+    display_name = SERIAL_TO_NAME.get(serial)
+    if display_name is None:
+        continue  # 매핑 표에 없는 장비는 무시
 
-    group_id = match.group(1)
-    display_name = match.group(0)
+    group_id = display_name[0]  # 이름 맨 앞 글자(A~G)
 
     try:
-        row_time_utc = pd.to_datetime(row[COL_TIME], utc=True)
-        row_time_kst = row_time_utc.tz_convert(timezone(timedelta(hours=9)))
+        row_time_kst = pd.to_datetime(row["timestamp_local"])
     except Exception:
         continue
 
@@ -127,22 +124,16 @@ for _, row in raw_df.iterrows():
     if key not in grouped_data:
         grouped_data[key] = {"측정시간": measured_time_str, "장비명": display_name, "℃": None, "%rF": None}
 
-    unit = str(row[COL_UNIT])
-    val = row[COL_VALUE]
+    prop = row["physical_property_name"]
+    val = row["measurement"]
     if pd.isna(val):
         continue
 
-    if unit in ('°C', 'C', 'DEG_C'):
+    if prop == "Temperature":
         grouped_data[key]["℃"] = float(val)
-    elif unit in ('%rF', 'RH', '%RH'):
+    elif prop == "Humidity":
         grouped_data[key]["%rF"] = float(val)
-
-processed_data = list(grouped_data.values())
-
-if not processed_data:
-    print("▶ 현재 수집 조건에 맞는 장비가 없어 저장하지 않습니다.")
-    exit()
-
+    # Density(절대습도)는 무시
 # ===================== 7. CSV 저장 (중복 방지, 기존과 동일) =====================
 df = pd.DataFrame(processed_data)[["측정시간", "장비명", "℃", "%rF"]]
 df = df.sort_values(by="장비명", ascending=True)
