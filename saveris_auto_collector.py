@@ -129,11 +129,17 @@ for _, row in raw_df.iterrows():
     if pd.isna(val):
         continue
 
-    if prop == "Temperature":
+    if prop == "Temperature" and row["physical_extension"] == "Unknown":
         grouped_data[key]["℃"] = float(val)
     elif prop == "Humidity":
         grouped_data[key]["%rF"] = float(val)
-    # Density(절대습도)는 무시
+        # Density(절대습도)는 무시
+processed_data = list(grouped_data.values())
+
+if not processed_data:
+    print("▶ 현재 수집 조건에 맞는 장비가 없어 저장하지 않습니다.")
+    exit()
+
 # ===================== 7. CSV 저장 (중복 방지, 기존과 동일) =====================
 df = pd.DataFrame(processed_data)[["측정시간", "장비명", "℃", "%rF"]]
 df = df.sort_values(by="장비명", ascending=True)
