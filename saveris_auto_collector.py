@@ -101,7 +101,8 @@ for _, row in raw_df.iterrows():
     group_id = display_name[0]  # 이름 맨 앞 글자(A~G)
 
     try:
-        row_time_kst = pd.to_datetime(row["timestamp_local"])
+        row_time_utc = pd.to_datetime(row["timestamp"], utc=True)
+        row_time_kst = row_time_utc.tz_convert(timezone(timedelta(hours=9)))
     except Exception:
         continue
 
@@ -118,7 +119,7 @@ for _, row in raw_df.iterrows():
     if not should_save:
         continue
 
-    measured_time_str = row_time_kst.strftime("%Y-%m-%dT%H:00:00Z")
+    measured_time_str = row_time_utc.strftime("%Y-%m-%dT%H:00:00Z")
     key = (display_name, measured_time_str)
 
     if key not in grouped_data:
