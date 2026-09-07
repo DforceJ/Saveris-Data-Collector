@@ -21,7 +21,9 @@ now_kst = datetime.now(timezone(timedelta(hours=9)))
 print(f"▶ 봇 실행 시간: {now_kst.strftime('%Y-%m-%d %H:%M:%S')}")
 
 now_utc = datetime.now(timezone.utc)
-date_from = (now_utc - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+# 기존 date_from = (now_utc - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+# 수정 (지연 대응을 위해 3시간치를 매번 다시 훑음)
+date_from = (now_utc - timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
 date_until = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # ===================== 3. 비동기 요청: 제출 → 폴링(20초 간격) → 다운로드 =====================
