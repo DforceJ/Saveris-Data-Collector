@@ -30,7 +30,11 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add Saveris_Data.csv
-          git commit -m "Add hourly saveris data"
-          git pull --rebase origin main  # 💡 [추가된 코드] 깃허브의 최신 변경사항을 먼저 가져와서 합칩니다.
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Add hourly saveris data"
+            git pull --rebase origin main
+            git push
+          else
+            echo "▶ 변경된 데이터가 없어 커밋을 건너뜁니다."
+          fi
 
