@@ -36,6 +36,8 @@ all_ids = list(id_to_name.keys())
 # 4. 최신 측정 데이터 가져오기
 params = {'ids': ",".join(all_ids)}
 data_response = requests.get(f"{BASE_URL}/saveris/v1/measuringPoint/value", headers=HEADERS, params=params)
+print("▶ 응답 코드:", data_response.status_code)
+print("▶ 응답 내용:", data_response.text[:1000])
 latest_values = data_response.json().get('measuringPoints', [])
 
 # 5. 조건부 데이터 필터링 및 병합
